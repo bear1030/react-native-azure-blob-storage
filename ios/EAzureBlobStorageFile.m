@@ -78,7 +78,8 @@ RCT_EXPORT_METHOD(uploadFile:(NSDictionary *)options
                     if (error){
                         reject(@"no_event",[NSString stringWithFormat: @"Error in creating blob. %@",filePath],error);
                     }else{
-                        resolve(fileName);
+                        NSString *url = [NSString stringWithFormat: @"https://%@.blob.core.windows.net/%@/%@", ACCOUNT_NAME, CONTAINER_NAME, fileName];
+                        resolve(url);
                     }       
                 }];
                 
