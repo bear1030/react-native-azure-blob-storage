@@ -24,8 +24,6 @@ import com.microsoft.azure.storage.blob.CloudBlobClient;
 import com.microsoft.azure.storage.blob.CloudBlobContainer;
 import com.microsoft.azure.storage.blob.CloudBlockBlob;
 import com.microsoft.azure.storage.blob.ListBlobItem;
-import com.microsoft.azure.storage.blob.SharedAccessBlobPolicy;
-import com.microsoft.azure.storage.blob.SharedAccessBlobPermissions;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -67,29 +65,16 @@ public class FileManager {
     }
 
     public static String UploadFile(InputStream image, int imageLength, String fileName, String contentType) throws Exception {
-
         CloudBlobContainer container = getContainer();
         container.createIfNotExists();
 
         BlobContainerPermissions permissions = container.downloadPermissions();
         container.uploadPermissions(permissions);
 
-        SharedAccessBlobPolicy sasPolicy = new SharedAccessBlobPolicy();
-        GregorianCalendar calendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
-        calendar.add(Calendar.HOUR, 10);
-        sasPolicy.setSharedAccessExpiryTime(calendar.getTime());
-
-        sasPolicy.setPermissions(EnumSet.of(SharedAccessBlobPermissions.READ,
-                SharedAccessBlobPermissions.WRITE,
-                SharedAccessBlobPermissions.LIST));
-
-
         CloudBlockBlob imageBlob = container.getBlockBlobReference(fileName);
         imageBlob.getProperties().setContentType(contentType);
         imageBlob.upload(image, imageLength);
-        String sas = imageBlob.generateSharedAccessSignature(sasPolicy, null);
-        return imageBlob.getUri().toString() + "?" + sas;
-
+        return imageBlob.getUri().toString();
     }
 
     public static String[] ListImages() throws Exception{
